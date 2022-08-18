@@ -1,0 +1,15 @@
+artifact_uri: file:///home/leobit/Development/medtrix/mlruns/1/95b72103896a41d885547b559c672592/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 95b72103896a41d885547b559c672592
+run_uuid: 95b72103896a41d885547b559c672592
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1660068953962
+status: 1
+tags: []
+user_id: leobit

@@ -1,0 +1,4 @@
+artifact_location: file:///home/leobit/Development/medtrix/mlruns/1
+experiment_id: '1'
+lifecycle_stage: active
+name: diamond
