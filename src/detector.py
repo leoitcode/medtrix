@@ -74,6 +74,11 @@ context_rules = [
 all_nlp.get_pipe('medspacy_context').add(context_rules)
     
 def join_ents(text,ents):
+    """
+    Join the Entities from De-Identification Model
+    input:  text, ents (entities)
+    output: new_ents (joined entities)
+    """
     new_ents = []
     for idx, ent in enumerate(ents):
         if not idx:
@@ -97,6 +102,11 @@ def join_ents(text,ents):
     return new_ents
 
 def get_deid(text):
+    """
+    De-Identification Model
+    input:  text
+    output: deid_d (Dictionary with found DEID Entities)
+    """
     ents = deid_nlp(text)
     ents = join_ents(text, ents)
     deid_d = {}
@@ -149,6 +159,14 @@ def get_deid(text):
     return deid_d
 
 def get_context(text, problems):
+    """
+    Get Context from found Problems (medspaCy)
+    input:  text, problems (Patient's problems)
+    output: pres_problems (Current Patient's problems)
+            hist_problems (Historical Patient's problems)
+            fam_problems (Family Patient's problems)
+            neg_problems (Negated Patient's problems)
+    """
     pres_problems = []
     hist_problems = []
     fam_problems = []
@@ -170,6 +188,14 @@ def get_context(text, problems):
 
 
 def get_problems(sentence):
+    """
+    Get problems from sentence (Stanza, scispaCy)
+    input:  sentence
+    output: pres_problems (Current Patient's problems)
+            hist_problems (Historical Patient's problems)
+            fam_problems (Family Patient's problems)
+            neg_problems (Negated Patient's problems)
+    """
     doc_stanza = spacy_stanza_nlp(sentence)
     doc_dis_spacy = dis_nlp(sentence)
     problems = [(ent.text, ent.start_char) for ent in doc_stanza.ents if ent.label_=="PROBLEM"]
@@ -183,6 +209,12 @@ def get_problems(sentence):
     return get_context(sentence, problems)
 
 def get_attention_words(sentence):
+    """
+    Get medical attention words from sentence (scispaCy, Negex)
+    input:  sentence
+    output: attentions (Medical Attention Words)
+            negs (Negated Attention Words)
+    """
     doc = scispacy_nlp(sentence)
     attentions = []
     negs = []
@@ -195,6 +227,12 @@ def get_attention_words(sentence):
     return attentions, negs
 
 def get_allergens(sentence):
+    """
+    Get allergens from sentence (Med7, COMPARE Database, medspaCy)
+    input:  sentence
+    output: allergens (Found Allergens in sentence)
+            negs (Negated Allergens)
+    """
     allergens = []
     negs = []
     doc_en = en_nlp(sentence)
@@ -215,6 +253,11 @@ def get_allergens(sentence):
     return allergens, negs
 
 def get_ents_input_text(text):
+    """
+    Pipeline to get all Entities from text
+    input:  text
+    output: input_d (Dictionary with all found entities by Subject)
+    """
     w_detected = []
     neg_problems = []
     
@@ -315,6 +358,13 @@ def get_entity_options(ents_l):
 
 
 def get_ents_input_text_vis(res, text, ent_style='span'):
+    """
+    Visualizate found Entities
+    input:  res (Dicitonary with found Entities)
+            text
+            ent_style (Displacy Visualization Entity type)
+    output: doc (spaCy document with entities), options
+    """
     _str_type = ['PATIENT', 'HOSP', 'STAFF', 'AGE', 'LOC']
     _str_or_tuple_type = ['DATE']
     _tuple_type = ['GENDER']

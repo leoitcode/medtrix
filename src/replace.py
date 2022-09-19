@@ -2,6 +2,7 @@ import re
 import datefinder
 from scripts.placeholdermapper import PlaceholderMapper
 
+# Mapper to replace PHI Labels with Fake Data
 plh = PlaceholderMapper()
 
 # Pattern to get Topics
@@ -23,6 +24,11 @@ year_old_p_2 = re.compile(f"(\d+)(?=\s*({'|'.join(year_old_l_2)}))")
 
 
 def get_topics_text(text):
+    """
+    Get each section and text from MIMIC Discharge
+    input:  text
+    output: sections_text (Dictionary with Sections[keys] and section text[values])
+    """
     topics = []
     positions = []
     sections_text = {}
@@ -42,6 +48,11 @@ def get_topics_text(text):
     return sections_text
 
 def replace_age(sentence, age):
+    """
+    Replace Age in sentence
+    input:  sentence
+    output: sentence (with new age)
+    """
     if sentence:
         target = " ".join(sentence.split()[:50])
         res = re.search(year_old_p_1, target)
@@ -60,6 +71,12 @@ def replace_age(sentence, age):
     return sentence
 
 def fake_phi_labels(sections_text, **kwargs):
+    """
+    Replace Personal Data (PHI Labels)
+    input:  sections_text (MIMIC Discharge on Dictionary Format)
+            kwargs (Found Personal Data in Input Text)
+    output: sections_text (MIMIC Discharge with Replaced Values)
+    """
     age = kwargs.get('AGE')
     dr_name = kwargs.get('STAFF')
     patient_name = kwargs.get('PATIENT')
@@ -237,6 +254,11 @@ def fake_phi_labels(sections_text, **kwargs):
     return sections_text
 
 def pretty_print_mimic(sections_text):
+    """
+    Pretty print the MIMIC document
+    input:  sections_text (MIMIC Discharge on Dictionary Format)
+    output: final_text (Formated Medical Document)
+    """
     final_text = ''
     for section, text in sections_text.items():
         new_section = section.replace("_"," ").title()

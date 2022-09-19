@@ -35,6 +35,11 @@ hpi_p = re.compile("\[\*\*[^\[]*\*\*\]", flags=0)
 lemmatizer = WordNetLemmatizer()
 
 def get_topics_text(text):
+    """
+    Get each section and text from MIMIC Discharge
+    input:  text
+    output: sections_text (Dictionary with Sections[keys] and section text[values])
+    """
     topics = []
     positions = []
     sections_text = {}
@@ -54,6 +59,11 @@ def get_topics_text(text):
     return sections_text
 
 def UMLSBert_similarity(sent1, sent2):
+    """
+    UmlsBERT Similarity
+    input:  sent1, sent2 (The sentences to compare)
+    output: float (UmlsBERT Similarity Coefficient)
+    """
     inputs_1 = coder_tokenizer(sent1, return_tensors='pt')
     inputs_2 = coder_tokenizer(sent2, return_tensors='pt')
 
@@ -63,6 +73,11 @@ def UMLSBert_similarity(sent1, sent2):
     return np.dot(sent_1_embed, sent_2_embed)/(norm(sent_1_embed)* norm(sent_2_embed))
 
 def get_jaccard_sim(words_l_1, words_l_2, prop=0.5):
+    """
+    Jaccard Similarity
+    input:  words_l_1, words_l_2 (The sentences lists to compare)
+    output: float (Jaccard Similarity Coefficient)
+    """
     words_l_1 = set(words_l_1)
     words_l_2 = set(words_l_2)
     len_1 = len(words_l_1)
@@ -76,6 +91,11 @@ def get_jaccard_sim(words_l_1, words_l_2, prop=0.5):
     return res_f
 
 def lemmatizer_l(sentence_l):
+    """
+    Lemmatization of sentence
+    input:  sentence_l (List of sentence's words)
+    output: new_sentencel (New Lemmatization sentence's words)
+    """
     new_sentence_l = []
     for sentence in sentence_l:
         word_l = word_tokenize(sentence)
@@ -85,6 +105,11 @@ def lemmatizer_l(sentence_l):
     return new_sentence_l
 
 def coeff(exp1, exp2, neg=False):
+    """
+    Pandas function Jaccard Similarity
+    input:  exp1, exp2 (Two expressions to compare)
+    output: Jaccard Coefficient
+    """
     exp1 = literal_eval(exp1)
     if (not exp1) or (not exp2):
         return 0
@@ -92,6 +117,11 @@ def coeff(exp1, exp2, neg=False):
     return jacc if not neg else -jacc
 
 def umls_coeff(exp1, exp2, neg=False):
+    """
+    Pandas function UmlsBERT Similarity
+    input:  exp1, exp2 (Two expressions to compare)
+    output: UmlsBERT Coefficient
+    """
     exp1 = literal_eval(exp1)
     exp1_s = " ".join(exp1)
     exp2_s = " ".join(exp2)
@@ -105,11 +135,16 @@ def umls_coeff(exp1, exp2, neg=False):
     return umls if not neg else -umls
 
 def get_similar_document(ents_d):
+    """
+    Pipeline to get the most similar document
+    input: ents_d (Dicitionary with detected Entities)
+    output: sections_text (MIMIC Discharge on Dictionary Format)
+    """
+    # Columns related to Problems, Attention and Historical subject
     prob_cols = ['chief_complaint', 'history_of_present_illness', 'brief_hospital_course', 'hospital_course', 'discharge_diagnosis']
     att_cols = ['social_history']
     hist_cols = ['past_medical_history']
     
-    ## PROBLEM SCORE, ATT SCORE, HIST SCORE, NEG
     cols_d = {}
     cols_d['PROBLEM'] = prob_cols
     cols_d['ATTENTION'] = att_cols
@@ -131,8 +166,9 @@ def get_similar_document(ents_d):
     else:
         pass
     
-    # Problems, Historical Problems, Attention, Negated
+    # 
     idx_subj = {}
+    # Coefficient for each MIMIC Section and Subjects: (Problems, Historical Problems, Attention, Negated)
     for subject, cols in cols_d.items():
         exp2 = lemmatizer_l([ent for ent, idx in ents_d[subject]])
         if subject!='NEGATED':
@@ -141,6 +177,8 @@ def get_similar_document(ents_d):
         else:
             for col in cols:
                 df_struct_target[f'coeff_{subject}_neg_{col}'] = df_struct_target[col].apply(coeff, exp2=exp2, neg=True)
+
+    # Selection of the Best Coefficient for each subject (Jaccard Similarity)
     for subject in cols_d.keys():
         if subject=='NEGATED':continue
         n_rows = 5
@@ -149,6 +187,7 @@ def get_similar_document(ents_d):
         df_struct_target[f'coeff_total_{subject}'] = df_struct_target[target_cols].sum(axis=1)
         idx_subj[subject] = df_struct_target.sort_values(by=f'coeff_total_{subject}', ascending=False).head(n_rows).index
     
+    # Selection of the Best Coefficient for each subject (UmlsBERT Similarity)
     idx_subj_f = {}
     for subject, idxs in idx_subj.items():
         if not ents_d[subject]:continue
