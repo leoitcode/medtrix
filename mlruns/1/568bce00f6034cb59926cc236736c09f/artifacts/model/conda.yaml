@@ -1,8 +1,0 @@
-channels:
-- conda-forge
-dependencies:
-- pip<=21.2.4
-- pip:
-  - mlflow
-  - pycaret==2.3.10
-name: diamond-env
