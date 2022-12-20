@@ -7,23 +7,23 @@ license = "Apache License 2.0"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-streamlit = "^1.12.2"
+streamlit = "^1.15.1"
 stanza = "^1.4.1"
 transformers = "^4.22.0"
 scipy = "^1.9.0"
-spacy = "3.4.1"
+spacy = "^3.4.3"
 scispacy = "^0.5.1"
 spacy-stanza = "^1.0.2"
 urllib3 = "^1.26.12"
 requests = "^2.28.1"
 nltk = "^3.7"
-en_core_sci_sm = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_core_sci_sm-0.5.1.tar.gz" }
-en_ner_bc5cdr_md = { url = "https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.1/en_ner_bc5cdr_md-0.5.1.tar.gz" }
 negspacy = "^1.0.3"
-torch = "^1.12.1"
+torch = "^1.13.0"
 datefinder = "^0.7.3"
 spacy-streamlit = "^1.0.4"
-pandas = "^1.4.4"
+pandas = "^1.5.2"
+medspacy = "^1.0.0"
+mlflow = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
 
